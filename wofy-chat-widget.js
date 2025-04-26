@@ -299,6 +299,39 @@
     20% { opacity: 1; }
     100% { opacity: 0.2; }
 }
+.n8n-chat-widget .chat-tooltip {
+    position: fixed;
+    bottom: 90px;
+    right: 90px;
+    background-color: var(--chat--color-primary);
+    color: #ffffff;
+    padding: 8px 12px;
+    border-radius: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    font-size: 16px;
+    opacity: 0.9;
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+    white-space: nowrap;
+    font-family: inherit;
+}
+
+/* Hide tooltip when chat is opened */
+.n8n-chat-widget .chat-container.open ~ .chat-tooltip {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+/* Pulse animation */
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(1.08); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.9; }
+}
+
+.n8n-chat-widget .chat-tooltip.pulse {
+    animation: pulse 1.4s ease-in-out infinite;
+}
           
     `;
 
@@ -392,9 +425,16 @@
             </div>
             <div class="chat-messages"></div>
             <div class="chat-input">
-                <textarea placeholder="Type your message here..." rows="1"></textarea>
-                <button type="submit"> > </button>
-            </div>
+    <textarea placeholder="Type your message here..." rows="1"></textarea>
+    <button type="submit">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+            <path fill="white" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+        </svg>
+
+
+
+    </button>
+</div>
             <div class="chat-footer">
                 <a href="${config.branding.poweredBy.link}" target="_blank">${config.branding.poweredBy.text}</a>
             </div>
@@ -409,9 +449,13 @@
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <path d="M12 2C6.477 2 2 6.477 2 12c0 1.821.487 3.53 1.338 5L2.5 21.5l4.5-.838A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18c-1.476 0-2.886-.313-4.156-.878l-3.156.586.586-3.156A7.962 7.962 0 014 12c0-4.411 3.589-8 8-8s8 3.589 8 8-3.589 8-8 8z"/>
         </svg>`;
+    const tooltip = document.createElement('div');
+    tooltip.className = 'chat-tooltip';
+    tooltip.innerText = 'How can I help you?';
 
     widgetContainer.appendChild(chatContainer);
     widgetContainer.appendChild(toggleButton);
+    widgetContainer.appendChild(tooltip);
     document.body.appendChild(widgetContainer);
 
     const newChatBtn = chatContainer.querySelector('.new-chat-btn');
@@ -539,6 +583,16 @@
 
     toggleButton.addEventListener('click', () => {
         chatContainer.classList.toggle('open');
+
+        if (chatContainer.classList.contains('open')) {
+            tooltip.classList.remove('pulse');
+        } else {
+            setTimeout(() => {
+                if (!chatContainer.classList.contains('open')) {
+                    tooltip.classList.add('pulse');
+                }
+            }, 5000); // after 5 sec start pulsing again if still closed
+        }
     });
 
     // Add close button handlers
@@ -548,4 +602,10 @@
             chatContainer.classList.remove('open');
         });
     });
+    setTimeout(() => {
+        if (!chatContainer.classList.contains('open')) {
+            tooltip.classList.add('pulse');
+        }
+    }, 5000);
+
 })();
