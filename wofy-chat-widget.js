@@ -301,8 +301,9 @@
 }
 .n8n-chat-widget .chat-tooltip {
     position: fixed;
-    bottom: 90px;
-    right: 90px;
+    bottom: 80px;
+    right: 70px;
+    z-index: 9999;
     background-color: var(--chat--color-primary);
     color: #ffffff;
     padding: 8px 12px;
