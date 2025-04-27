@@ -335,7 +335,13 @@
 }
           
     `;
-
+    function markdownToHtml(text) {
+        return text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+            .replace(/\n/g, '<br>') // Line breaks
+            .replace(/- (.*?)(?=\n|$)/g, '<li>$1</li>') // Bullet points
+            .replace(/(?:<li>.*<\/li>)/g, (match) => `<ul>${match}</ul>`); // Wrap in <ul>
+    }
     // Load Geist font
     const fontLink = document.createElement('link');
     fontLink.rel = 'stylesheet';
@@ -494,11 +500,15 @@
             chatContainer.querySelector('.new-conversation').style.display = 'none';
             chatInterface.classList.add('active');
 
-            const botMessageDiv = document.createElement('div');
-            botMessageDiv.className = 'chat-message bot';
-            botMessageDiv.textContent = Array.isArray(responseData) ? responseData[0].output : responseData.output;
-            messagesContainer.appendChild(botMessageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            const botResponse = Array.isArray(responseData) ? responseData[0]?.output : responseData?.output;
+
+            if (botResponse) {
+                const botMessageDiv = document.createElement('div');
+                botMessageDiv.className = 'chat-message bot';
+                botMessageDiv.innerHTML = marked.parse(botResponse); // use marked if you want nice HTML formatting
+                messagesContainer.appendChild(botMessageDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
         } catch (error) {
             console.error('Error:', error);
         }
@@ -551,7 +561,8 @@
             // 👉 Add real bot response
             const botMessageDiv = document.createElement('div');
             botMessageDiv.className = 'chat-message bot';
-            botMessageDiv.textContent = Array.isArray(data) ? data[0].output : data.output;
+            const botResponse = Array.isArray(data) ? data[0].output : data.output;
+            botMessageDiv.innerHTML = marked.parse(botResponse);
             messagesContainer.appendChild(botMessageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         } catch (error) {
